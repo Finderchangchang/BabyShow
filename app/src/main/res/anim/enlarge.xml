@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shareInterpolator="false">
+    <scale
+        android:duration="4000"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:startOffset="0"
+        android:toXScale="1.2"
+        android:toYScale="1.2" />
+    <!-- 1.动画效果执行时间
+        2，3.动画开始前x,y的缩放。0.0为不显示。1.0为正常大小
+        4，5.动画起始位置，相对于屏幕的百分比，两个都为50%表示动画从屏幕中间开始
+        6.动画多次执行的间隔时间
+        7，8.动画最终缩放的倍数。1.0为正常。大于1.0放大。小于1.0缩小-->
+</set>
