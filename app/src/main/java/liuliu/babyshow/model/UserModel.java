@@ -9,15 +9,25 @@ import cn.bmob.v3.BmobObject;
  * @Email 1031066280@qq.com
  */
 public class UserModel extends BmobObject {
-    private String name;//用户名
+    private String id;//登录的账号
+    private String nickname;//用户名（昵称）
     private String password;//密码
+    private String telnum;//手机号码
 
-    public String getName() {
-        return name;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getPassword() {
@@ -26,5 +36,13 @@ public class UserModel extends BmobObject {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getTelnum() {
+        return telnum;
+    }
+
+    public void setTelnum(String telnum) {
+        this.telnum = telnum;
     }
 }

@@ -10,6 +10,10 @@ import liuliu.babyshow.R;
 import liuliu.babyshow.base.BaseActivity;
 import liuliu.custom.method.Utils;
 
+/**
+ * @author liuliu
+ */
+
 public class LoadingActivity extends BaseActivity {
     public static LoadingActivity mInstance;
     @CodeNote(id = R.id.bg_loading_iv)
@@ -23,6 +27,7 @@ public class LoadingActivity extends BaseActivity {
 
     @Override
     public void initEvents() {
+        /*自定义动画加载*/
         Animation mAnimation = AnimationUtils.loadAnimation(mInstance, R.anim.enlarge);
         mAnimation.setFillAfter(true);
         bg_img.startAnimation(mAnimation);

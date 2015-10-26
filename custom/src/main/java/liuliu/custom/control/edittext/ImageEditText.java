@@ -106,6 +106,9 @@ public class ImageEditText extends LinearLayout {
             mEditText.setText(mCenterText);
             mEditText.setSelection(mCenterText.length());
         }
+        if(mHintText!=""||mHintText!=null){
+            mEditText.setHint(mHintText);
+        }
         //设置EditTextll的背景
         if (mEditBg_int != 0) {
             mEditLL.setBackgroundResource(mEditBg_int);

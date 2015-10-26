@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F3F3"
+    android:orientation="vertical">
+
+    <liuliu.custom.control.toolbar.TToolbar
+        android:id="@+id/toolbar_reg_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:center_title="用户注册"
+        app:left_img="@mipmap/ttoolbar_back" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <liuliu.custom.control.edittext.ImageEditText
+            android:id="@+id/tel_et_reg_user"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/selector_edittext_bg_only_bottom"
+            app:ie_left_text="手机号" />
+        <Button
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:text="剩余10s"
+            android:layout_marginRight="10dp"/>
+    </LinearLayout>
+
+
+    <liuliu.custom.control.edittext.ImageEditText
+        android:id="@+id/code_et_reg_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/selector_edittext_bg_only_bottom"
+        app:ie_left_text="验证码" />
+
+    <Button
+        android:id="@+id/btn_reg_user"
+        style="@style/Button_No_RadiusStyle"
+        android:elevation="10dip"
+        android:text="注册" />
+</LinearLayout>
