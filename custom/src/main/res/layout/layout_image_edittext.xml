@@ -13,23 +13,37 @@
             android:id="@+id/img_edit_left_lab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="账号" />
-
-        <EditText
-            android:id="@+id/img_edit_center_edit"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@null"
-            android:paddingLeft="5dp" />
-
+            android:layout_marginLeft="10dp"
+            android:text="账号"
+            android:visibility="gone"/>
         <ImageView
-            android:id="@+id/img_edit_right_del_img"
-            android:layout_width="15dp"
-            android:layout_height="15dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/icon_delete" />
+            android:id="@+id/img_edit_left_img"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/img_edit_ll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/img_edit_center_edit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@null"
+                android:paddingLeft="5dp" />
+
+            <ImageView
+                android:id="@+id/img_edit_right_del_img"
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/icon_delete" />
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

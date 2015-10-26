@@ -6,6 +6,7 @@ import android.os.StrictMode;
 import net.tsz.afinal.FinalActivity;
 import net.tsz.afinal.FinalDb;
 
+import cn.bmob.v3.Bmob;
 import liuliu.custom.method.Utils;
 import liuliu.custom.model.AuthorizeModel;
 import liuliu.custom.model.Cryptography;
@@ -30,6 +31,9 @@ public abstract class BaseActivity extends FinalActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         initEvents();
+        // 初始化 Bmob SDK
+        // 使用时请将第二个参数Application ID替换成你在Bmob服务器端创建的Application ID
+        Bmob.initialize(this, "58ad362bfd8c7253ebc156096abeb0f0");
     }
 
     public abstract void initViews();

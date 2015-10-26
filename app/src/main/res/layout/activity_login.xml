@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F2F3F3"
+    android:orientation="vertical"
+    tools:context="liuliu.babyshow.activity.LoginActivity">
+
+    <liuliu.custom.control.toolbar.TToolbar
+        android:id="@+id/toolbar_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:center_title="用户登录" />
+    <liuliu.custom.control.edittext.ImageEditText
+        android:id="@+id/user_et_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:ie_et_bg="@drawable/selector_edittext_bg_only_bottom"
+        app:ie_left_img="@color/red"
+        app:ie_text="请输入用户名"/>
+    <liuliu.custom.control.edittext.ImageEditText
+        android:id="@+id/password_et_login"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:ie_et_bg="@drawable/selector_edittext_bg_only_bottom"
+        app:ie_left_img="@color/red"
+        app:ie_text="请输入密码"/>
+
+    <Button
+        android:id="@+id/user_btn_login"
+        style="@style/Button_No_RadiusStyle"
+        android:elevation="10dip"
+        android:text="登录" />
+</LinearLayout>

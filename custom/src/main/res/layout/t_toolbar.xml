@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/toolbar_top_rl"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
+    android:layout_height="wrap_content"
     android:background="#4276fb"
     android:orientation="vertical">
-    <!--android:elevation="4dp"-->
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -14,12 +13,14 @@
         android:layout_height="wrap_content"
         android:background="#4276fb"
         android:minHeight="0dp"
+        android:elevation="10dip"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"></android.support.v7.widget.Toolbar>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/abc_action_bar_default_height_material"
-        android:orientation="horizontal">
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:elevation="10dip">
 
         <LinearLayout
             android:id="@+id/toolbar_left_ll"
@@ -47,6 +48,7 @@
                 android:textSize="12sp"
                 android:textStyle="bold" />
         </LinearLayout>
+
         <TextView
             android:id="@+id/toolbar_center_title"
             android:layout_width="wrap_content"
@@ -55,15 +57,15 @@
             android:layout_centerVertical="true"
             android:textColor="@android:color/white"
             android:textSize="18sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
+
         <RelativeLayout
             android:id="@+id/toolbar_center_ll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/toolbar_left_ll"
             android:layout_toLeftOf="@+id/toolbar_right_rl_img"
-            android:layout_toStartOf="@+id/toolbar_right_rl_img">
-        </RelativeLayout>
+            android:layout_toRightOf="@+id/toolbar_left_ll"
+            android:layout_toStartOf="@+id/toolbar_right_rl_img"></RelativeLayout>
 
 
         <RelativeLayout
@@ -107,10 +109,9 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:layout_marginTop="13dp"
-
                     android:textColor="#fff"
                     android:textStyle="bold" />
             </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
-</RelativeLayout><!--android:text=" +5 "-->
+</RelativeLayout>

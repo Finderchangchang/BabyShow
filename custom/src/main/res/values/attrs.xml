@@ -11,10 +11,16 @@
         <attr name="border_overlay" format="boolean" />
     </declare-styleable>
     <declare-styleable name="ImageEditText">
-        <attr name="text_lab" format="string"></attr>
-        <attr name="text" format="string"></attr>
-        <attr name="have_del" format="boolean"></attr>
-        <attr name="have_pwd" format="boolean"></attr>
+        <attr name="ie_left_text" format="string"></attr>
+        <!-- 左侧显示图片-->
+        <attr name="ie_left_img" format="reference"></attr>
+        <attr name="ie_text" format="string"></attr>
+        <attr name="ie_hint_text" format="string"></attr>
+        <!--EditText底部样式 -->
+        <attr name="ie_et_bg" format="reference"></attr>
+        <attr name="ie_have_del" format="boolean"></attr>
+        <attr name="ie_have_pwd" format="boolean"></attr>
+
     </declare-styleable>
 
     <!-- 浮动Button-->

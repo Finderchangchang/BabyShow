@@ -34,7 +34,7 @@ public class LoadingActivity extends BaseActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Utils.IntentPost(mInstance, MainActivity.class);
+                Utils.IntentPost(mInstance, LoginActivity.class);
                 mInstance.finish();
             }
 

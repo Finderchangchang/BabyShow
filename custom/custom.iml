@@ -91,16 +91,21 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 22 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="core" level="project" />
     <orderEntry type="library" exported="" name="library-2.4.0" level="project" />
-    <orderEntry type="library" exported="" name="material-menu-1.5.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-22.2.0" level="project" />
-    <orderEntry type="library" exported="" name="CH34xDriver" level="project" />
-    <orderEntry type="library" exported="" name="material-menu-toolbar-1.5.1" level="project" />
+    <orderEntry type="library" exported="" name="okhttp-2.4.0" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.2.0" level="project" />
     <orderEntry type="library" exported="" name="roundedimageview-2.2.0" level="project" />
-    <orderEntry type="library" exported="" name="sun.misc.BASE64Decoder" level="project" />
+    <orderEntry type="library" exported="" name="bmob-im-1.1.9" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.0" level="project" />
+    <orderEntry type="library" exported="" name="core" level="project" />
+    <orderEntry type="library" exported="" name="material-menu-1.5.1" level="project" />
+    <orderEntry type="library" exported="" name="bmob-sdk-3.4.3" level="project" />
+    <orderEntry type="library" exported="" name="CH34xDriver" level="project" />
+    <orderEntry type="library" exported="" name="material-menu-toolbar-1.5.1" level="project" />
+    <orderEntry type="library" exported="" name="bmob-sms-1.0.1" level="project" />
+    <orderEntry type="library" exported="" name="sun.misc.BASE64Decoder" level="project" />
+    <orderEntry type="library" exported="" name="okio-1.4.0" level="project" />
   </component>
 </module>
