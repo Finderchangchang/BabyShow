@@ -34,17 +34,25 @@ public class ImageEditText extends LinearLayout {
     private String mCenterText;//中间EditText内容
     private EditText mEditText;//中间EditText控件
     private ImageView mRightDelImg;
+    private LinearLayout mEditLL;
+    private ImageView mLeftImg;//左侧图片
     private boolean mHaveDel;//有删除按钮
     private TextView mLeftText;
     private boolean mHavePwd = false;
+    private int mEditBg_int;
+    private int mLeftImg_int;
+    private String mHintText;
 
     public ImageEditText(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.ImageEditText, defStyle, 0);
-        mLeftLab = a.getString(R.styleable.ImageEditText_text_lab);
-        mCenterText = a.getString(R.styleable.ImageEditText_text);
-        mHaveDel = a.getBoolean(R.styleable.ImageEditText_have_del, true);
-        mHavePwd = a.getBoolean(R.styleable.ImageEditText_have_pwd, false);
+        mLeftLab = a.getString(R.styleable.ImageEditText_ie_left_text);
+        mCenterText = a.getString(R.styleable.ImageEditText_ie_text);
+        mHaveDel = a.getBoolean(R.styleable.ImageEditText_ie_have_del, true);
+        mHavePwd = a.getBoolean(R.styleable.ImageEditText_ie_have_pwd, false);
+        mEditBg_int = a.getResourceId(R.styleable.ImageEditText_ie_et_bg, 0);
+        mLeftImg_int = a.getResourceId(R.styleable.ImageEditText_ie_left_img, 0);//文本框左侧显示的图片
+        mHintText=a.getString(R.styleable.ImageEditText_ie_hint_text);
         a.recycle();
         init(context);
     }
@@ -83,16 +91,29 @@ public class ImageEditText extends LinearLayout {
         mLeftText = (TextView) this.findViewById(R.id.img_edit_left_lab);
         mEditText = (EditText) this.findViewById(R.id.img_edit_center_edit);
         mRightDelImg = (ImageView) this.findViewById(R.id.img_edit_right_del_img);
+        mEditLL = (LinearLayout) this.findViewById(R.id.img_edit_ll);
+        mLeftImg = (ImageView) this.findViewById(R.id.img_edit_left_img);
     }
 
     private void initEvents() {
-        mLeftText.setText(mLeftLab);//左侧文字头设置
-
+        if (mLeftLab != "" || mLeftLab != null) {
+            mLeftText.setVisibility(VISIBLE);
+            mLeftText.setText(mLeftLab);//左侧文字头设置
+        }
 
         //设置EditText里面显示的内容
         if (mCenterText != null) {
             mEditText.setText(mCenterText);
             mEditText.setSelection(mCenterText.length());
+        }
+        //设置EditTextll的背景
+        if (mEditBg_int != 0) {
+            mEditLL.setBackgroundResource(mEditBg_int);
+        }
+        //设置左侧显示的图片
+        if (mLeftImg_int != 0) {
+            mLeftImg.setVisibility(VISIBLE);
+            mLeftImg.setImageResource(mLeftImg_int);
         }
         //设置删除图片显示隐藏
         if (!mEditText.getText().toString().trim().equals("")) {
