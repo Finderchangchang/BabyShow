@@ -117,5 +117,6 @@
     <orderEntry type="library" exported="" name="bmob-sdk-3.4.3" level="project" />
     <orderEntry type="library" exported="" name="CH34xDriver" level="project" />
     <orderEntry type="library" exported="" name="umeng_httpmime-4.1.3" level="project" />
+    <orderEntry type="module" module-name="signshare" exported="" />
   </component>
 </module>

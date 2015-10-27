@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.0.1'
     compile project(':afinal')
     compile project(':custom')
+    compile project(':signshare')
 }

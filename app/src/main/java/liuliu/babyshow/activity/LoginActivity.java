@@ -1,28 +1,26 @@
 package liuliu.babyshow.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.LinearLayout;
 
-import com.umeng.socialize.bean.SHARE_MEDIA;
-import com.umeng.socialize.controller.UMServiceFactory;
-import com.umeng.socialize.controller.UMSocialService;
-import com.umeng.socialize.controller.listener.SocializeListeners;
-import com.umeng.socialize.exception.SocializeException;
-import com.umeng.socialize.sso.QZoneSsoHandler;
-import com.umeng.socialize.sso.UMQQSsoHandler;
+import com.sina.weibo.sdk.auth.AuthInfo;
+import com.sina.weibo.sdk.auth.Oauth2AccessToken;
+import com.sina.weibo.sdk.auth.WeiboAuthListener;
+import com.sina.weibo.sdk.auth.sso.SsoHandler;
+import com.sina.weibo.sdk.exception.WeiboException;
 
 import net.tsz.afinal.annotation.view.CodeNote;
-
-import java.util.Map;
 
 import liuliu.babyshow.R;
 import liuliu.babyshow.base.BaseActivity;
 import liuliu.babyshow.control.login.ILoginView;
 import liuliu.babyshow.control.login.LoginListener;
+import liuliu.babyshow.model.User;
 import liuliu.custom.control.edittext.ImageEditText;
 import liuliu.custom.desc.Constants;
 import liuliu.custom.method.Utils;
@@ -39,13 +37,14 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @CodeNote(id = R.id.password_et_login)
     ImageEditText user_pwd;//密码
     @CodeNote(id = R.id.qq_iv_login, click = "onClick")
-    ImageView qq_login;
+    LinearLayout qq_login;
     @CodeNote(id = R.id.sina_iv_login, click = "onClick")
-    ImageView sina_login;
+    LinearLayout sina_login;
     @CodeNote(id = R.id.wenxin_iv_login, click = "onClick")
-    ImageView wenxin_login;
+    LinearLayout wenxin_login;
 
-    private UMSocialService mController = UMServiceFactory.getUMSocialService("com.umeng.login");
+    private AuthInfo mAuthInfo;
+    private SsoHandler mSsoHandler;//注意：SsoHandler 仅当 SDK 支持 SSO 时有效
 
     @Override
     public void initViews() {
@@ -56,7 +55,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     @Override
     public void initEvents() {
-        addQZoneQQPlatform();
+
     }
 
     public void onClick(View view) {
@@ -64,97 +63,81 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             case R.id.user_btn_login:
                 break;
             case R.id.reg_user_btn_login:
+                Utils.ToastShort(sInstance, "当前未开放注册，请选择快捷登录");
                 break;
             case R.id.qq_iv_login:
-                login(SHARE_MEDIA.QQ);
+                mlistener.qqLogin();
                 break;
             case R.id.sina_iv_login:
-                login(SHARE_MEDIA.SINA);
+                mAuthInfo = new AuthInfo(LoginActivity.sInstance, Constants.SINA_APPID, Constants.REDIRECT_URL, Constants.SCOPE);
+                mSsoHandler = new SsoHandler(LoginActivity.sInstance, mAuthInfo);
+
+//                mlistener.sinaLogin(mSsoHandler);
+                mSsoHandler.authorize(new AuthListener());
                 break;
         }
     }
 
+    private Oauth2AccessToken mAccessToken;//封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
+
+    /**
+     * 微博认证授权回调类。
+     * 1. SSO 授权时，需要在 {onActivityResult} 中调用 {@link SsoHandler#authorizeCallBack} 后，
+     * 该回调才会被执行。
+     * 2. 非 SSO 授权时，当授权结束后，该回调就会被执行。
+     * 当授权成功后，请保存该 access_token、expires_in、uid 等信息到 SharedPreferences 中。
+     */
+    class AuthListener implements WeiboAuthListener {
+
+        @Override
+        public void onComplete(Bundle values) {
+            // 从 Bundle 中解析 Token
+            mAccessToken = Oauth2AccessToken.parseAccessToken(values);
+            if (mAccessToken != null) {
+                // 保存 Token 到 SharedPreferences
+                String uid = values.getString("uid").toString();
+                String username = values.getString("userName").toString();
+//                AccessTokenKeeper.writeAccessToken(sInstance, mAccessToken);
+            } else {
+                String code = values.getString("code");
+                String message = "取消授权";
+                if (!TextUtils.isEmpty(code)) {
+                    message = message + "\nObtained the code: " + code;
+                }
+            }
+        }
+
+        @Override
+        public void onCancel() {
+//                    "授权取消"
+        }
+
+        @Override
+        public void onWeiboException(WeiboException e) {
+//                    "Auth exception : " + e.getMessage()
+        }
+    }
+
+    /**
+     * 当 SSO 授权 Activity 退出时，该函数被调用。
+     *
+     * @see {@link Activity#onActivityResult}
+     */
     @Override
-    public void OnLoginResult(boolean result, String message) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // 重要：发起 SSO 登陆的 Activity 必须重写 onActivityResults
+        if (mSsoHandler != null) {
+            mSsoHandler.authorizeCallBack(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
+    public void OnLoginResult(boolean result, User user) {
         if (result) {//登录成功
 
         } else {//登录失败
 
         }
-    }
-
-    /*初始化QQ登陆*/
-    private void addQZoneQQPlatform() {
-        // 添加QQ支持, 并且设置QQ分享内容的target url
-        UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(sInstance,
-                Constants.QQ_APPID, Constants.QQ_KEY);
-        qqSsoHandler.setTargetUrl("http://www.umeng.com");
-        qqSsoHandler.addToSocialSDK();
-
-        // 添加QZone平台
-        QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(sInstance, Constants.QQ_APPID, Constants.QQ_KEY);
-        qZoneSsoHandler.addToSocialSDK();
-    }
-    private void addSina(){
-        UMSocialService mController = UMServiceFactory.getUMSocialService("com.umeng.login");
-    }
-
-    /**
-     * 授权。如果授权成功，则获取用户信息</br>
-     */
-    private void login(final SHARE_MEDIA platform) {
-        mController.doOauthVerify(sInstance, platform, new SocializeListeners.UMAuthListener() {
-
-            @Override
-            public void onStart(SHARE_MEDIA platform) {
-                Utils.ToastShort(sInstance, "start");
-            }
-
-            @Override
-            public void onError(SocializeException e, SHARE_MEDIA platform) {
-            }
-
-            @Override
-            public void onComplete(Bundle value, SHARE_MEDIA platform) {
-                Utils.ToastShort(sInstance, "onComplete");
-                String uid = value.getString("uid");
-                if (!TextUtils.isEmpty(uid)) {
-                    getUserInfo(platform);
-                } else {
-                    Utils.ToastShort(sInstance, "授权失败...");
-                }
-            }
-
-            @Override
-            public void onCancel(SHARE_MEDIA platform) {
-            }
-        });
-    }
-
-    /**
-     * 获取授权平台的用户信息</br>
-     */
-    private void getUserInfo(SHARE_MEDIA platform) {
-        mController.getPlatformInfo(sInstance, platform, new SocializeListeners.UMDataListener() {
-
-            @Override
-            public void onStart() {
-
-            }
-
-            @Override
-            public void onComplete(int status, Map<String, Object> info) {
-                // String showText = "";
-                // if (status == StatusCode.ST_CODE_SUCCESSED) {
-                // showText = "用户名：" + info.get("screen_name").toString();
-                // Log.d("#########", "##########" + info.toString());
-                // } else {
-                // showText = "获取用户信息失败";
-                // }
-                if (info != null) {
-                    Toast.makeText(sInstance, info.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 }

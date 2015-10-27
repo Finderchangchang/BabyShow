@@ -51,4 +51,5 @@ dependencies {
     compile files('libs/SocialSDK_tencentWB_1.jar')
     compile files('libs/SocialSDK_tencentWB_2.jar')
     compile files('libs/SocialSDK_tencentWB_3.jar')
+    compile project(':signshare')
 }

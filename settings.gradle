@@ -1,1 +1,1 @@
-include ':app',':afinal',':custom'
+include ':app',':afinal',':custom',":signshare"

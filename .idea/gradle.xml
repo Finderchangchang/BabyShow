@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/afinal" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/custom" />
+            <option value="$PROJECT_DIR$/signshare" />
           </set>
         </option>
       </GradleProjectSettings>

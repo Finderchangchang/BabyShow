@@ -52,25 +52,43 @@
         android:layout_height="130dp"
         android:layout_margin="10dp">
 
-        <ImageView
+        <LinearLayout
             android:id="@+id/qq_iv_login"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/red"/>
+            android:gravity="center_vertical|center_horizontal">
 
-        <ImageView
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@mipmap/qq" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/sina_iv_login"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/black"/>
+            android:gravity="center_vertical|center_horizontal">
 
-        <ImageView
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@color/black" />
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/wenxin_iv_login"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/blue"/>
+            android:gravity="center_vertical|center_horizontal">
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@color/blue" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
