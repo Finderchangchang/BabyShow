@@ -2,9 +2,16 @@ package liuliu.babyshow.control.login;
 
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.widget.Toast;
 
+import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
+import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
+import com.sina.weibo.sdk.exception.WeiboException;
+import com.sina.weibo.sdk.net.RequestListener;
+import com.sina.weibo.sdk.openapi.UsersAPI;
+import com.sina.weibo.sdk.openapi.models.ErrorInfo;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
@@ -32,7 +39,6 @@ public class LoginListener {
     User mUser;
 
 
-
     public LoginListener(ILoginView loginView) {
         this.mLoginView = loginView;
         mUser = new User();
@@ -49,22 +55,98 @@ public class LoginListener {
         mLoginView.OnLoginResult(true, null);
     }
 
-    /**
-     * qq快捷登录
-     */
+    /*qq快捷登录*/
     public void qqLogin() {
         initQQ();
         login(SHARE_MEDIA.QQ);
     }
 
-    /**
-     * 微博快捷登录
-     */
+    /*微博快捷登录*/
     public void sinaLogin(SsoHandler ssoHandler) {
-//        ssoHandler.authorize(new AuthListener());
+        ssoHandler.authorize(new AuthListener());
     }
 
+    private AuthInfo mAuthInfo;
+    private Oauth2AccessToken mAccessToken;//封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
+    private UsersAPI mUsersAPI;
 
+    class AuthListener implements WeiboAuthListener {
+        @Override
+        public void onComplete(Bundle values) {
+            // 从 Bundle 中解析 Token
+            mAccessToken = Oauth2AccessToken.parseAccessToken(values);
+            if (mAccessToken != null) {
+                long uid = Long.parseLong(mAccessToken.getUid());
+                mUsersAPI = new UsersAPI(LoginActivity.sInstance, Constants.SINA_KEY, mAccessToken);
+                mUsersAPI.show(uid, mListener);
+            } else {
+                String code = values.getString("code");
+                String message = "取消授权";
+                if (!TextUtils.isEmpty(code)) {
+                    message = message + "\nObtained the code: " + code;
+                }
+            }
+        }
+
+        @Override
+        public void onCancel() {
+
+        }
+
+        @Override
+        public void onWeiboException(WeiboException e) {
+
+        }
+    }
+
+    /*微博 OpenAPI 回调接口。*/
+    private RequestListener mListener = new RequestListener() {
+        @Override
+        public void onComplete(String response) {
+            if (!TextUtils.isEmpty(response)) {
+                // 调用 User#parse 将JSON串解析成User对象
+                com.sina.weibo.sdk.openapi.models.User user = com.sina.weibo.sdk.openapi.models.User.parse(response);
+                if (user != null) {//根据id获得登录微博用户的所有信息
+                    mUser.setMessage("登录成功！");
+                    mUser.setId(user.id);//唯一ID
+                    mUser.setNickname(user.screen_name);//昵称
+                    if (!user.gender.isEmpty()) {//性别
+                        switch (user.gender) {
+                            case "m":
+                                mUser.setGender("男");
+                                break;
+                            case "f":
+                                mUser.setGender("女");
+                                break;
+                            case "未知":
+                                mUser.setGender("未知");
+                                break;
+                        }
+                    }
+                    if (!user.location.isEmpty()) {
+                        String loca[] = user.location.split(" ");
+                        if (loca.length >= 2) {
+                            mUser.setQq_city(user.location.split(" ")[1]);//qq上显示的所在市
+                        } else if (loca.length == 1) {
+                            mUser.setQq_province(user.location.split(" ")[0]);//qq显示的所在省
+                        }
+                    }
+                    mUser.setHeadimg_urlbig(user.avatar_large);//大头像
+                    mUser.setHeadimg_urlsmall(user.profile_image_url);//小头像(50*50)
+                    mUser.setSigntype(SignType.SINA);
+                    mLoginView.OnLoginResult(true, mUser);
+                } else {
+                    Toast.makeText(LoginActivity.sInstance, response, Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+        @Override
+        public void onWeiboException(WeiboException e) {
+            ErrorInfo info = ErrorInfo.parse(e.getMessage());
+            Toast.makeText(LoginActivity.sInstance, info.toString(), Toast.LENGTH_LONG).show();
+        }
+    };
 
     /*加载qq平台*/
     private void initQQ() {

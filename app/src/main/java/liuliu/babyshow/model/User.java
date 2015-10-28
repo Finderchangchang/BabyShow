@@ -25,6 +25,7 @@ public class User extends BmobObject {
     private String password;//密码
     private String telnum;//手机号码
     private String token_info;//token详细信息
+    private String content;//简介
     private String token;//token
     private String message;//当出现错误时返回错误提示
 

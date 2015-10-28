@@ -1,18 +1,14 @@
 package liuliu.babyshow.activity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
-import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
-import com.sina.weibo.sdk.exception.WeiboException;
+import com.sina.weibo.sdk.openapi.UsersAPI;
 
 import net.tsz.afinal.annotation.view.CodeNote;
 
@@ -45,6 +41,8 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     private AuthInfo mAuthInfo;
     private SsoHandler mSsoHandler;//注意：SsoHandler 仅当 SDK 支持 SSO 时有效
+    private Oauth2AccessToken mAccessToken;//封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
+    private UsersAPI mUsersAPI;
 
     @Override
     public void initViews() {
@@ -55,7 +53,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     @Override
     public void initEvents() {
-
+        mUsersAPI = new UsersAPI(this, Constants.SINA_KEY, mAccessToken);//微博信息初始化
     }
 
     public void onClick(View view) {
@@ -71,58 +69,12 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             case R.id.sina_iv_login:
                 mAuthInfo = new AuthInfo(LoginActivity.sInstance, Constants.SINA_APPID, Constants.REDIRECT_URL, Constants.SCOPE);
                 mSsoHandler = new SsoHandler(LoginActivity.sInstance, mAuthInfo);
-
-//                mlistener.sinaLogin(mSsoHandler);
-                mSsoHandler.authorize(new AuthListener());
+                mlistener.sinaLogin(mSsoHandler);
                 break;
         }
     }
 
-    private Oauth2AccessToken mAccessToken;//封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
-
-    /**
-     * 微博认证授权回调类。
-     * 1. SSO 授权时，需要在 {onActivityResult} 中调用 {@link SsoHandler#authorizeCallBack} 后，
-     * 该回调才会被执行。
-     * 2. 非 SSO 授权时，当授权结束后，该回调就会被执行。
-     * 当授权成功后，请保存该 access_token、expires_in、uid 等信息到 SharedPreferences 中。
-     */
-    class AuthListener implements WeiboAuthListener {
-
-        @Override
-        public void onComplete(Bundle values) {
-            // 从 Bundle 中解析 Token
-            mAccessToken = Oauth2AccessToken.parseAccessToken(values);
-            if (mAccessToken != null) {
-                // 保存 Token 到 SharedPreferences
-                String uid = values.getString("uid").toString();
-                String username = values.getString("userName").toString();
-//                AccessTokenKeeper.writeAccessToken(sInstance, mAccessToken);
-            } else {
-                String code = values.getString("code");
-                String message = "取消授权";
-                if (!TextUtils.isEmpty(code)) {
-                    message = message + "\nObtained the code: " + code;
-                }
-            }
-        }
-
-        @Override
-        public void onCancel() {
-//                    "授权取消"
-        }
-
-        @Override
-        public void onWeiboException(WeiboException e) {
-//                    "Auth exception : " + e.getMessage()
-        }
-    }
-
-    /**
-     * 当 SSO 授权 Activity 退出时，该函数被调用。
-     *
-     * @see {@link Activity#onActivityResult}
-     */
+    /*当 SSO 授权 Activity 退出时，该函数被调用。*/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -131,7 +83,6 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             mSsoHandler.authorizeCallBack(requestCode, resultCode, data);
         }
     }
-
     @Override
     public void OnLoginResult(boolean result, User user) {
         if (result) {//登录成功
