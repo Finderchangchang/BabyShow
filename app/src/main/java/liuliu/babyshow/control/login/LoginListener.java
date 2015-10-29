@@ -1,17 +1,16 @@
 package liuliu.babyshow.control.login;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
 import com.sina.weibo.sdk.net.RequestListener;
 import com.sina.weibo.sdk.openapi.UsersAPI;
-import com.sina.weibo.sdk.openapi.models.ErrorInfo;
 import com.umeng.socialize.bean.SHARE_MEDIA;
 import com.umeng.socialize.controller.UMServiceFactory;
 import com.umeng.socialize.controller.UMSocialService;
@@ -20,8 +19,15 @@ import com.umeng.socialize.exception.SocializeException;
 import com.umeng.socialize.sso.QZoneSsoHandler;
 import com.umeng.socialize.sso.UMQQSsoHandler;
 
+import net.tsz.afinal.FinalDb;
+
+import java.util.List;
 import java.util.Map;
 
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
 import liuliu.babyshow.activity.LoginActivity;
 import liuliu.babyshow.model.SignType;
 import liuliu.babyshow.model.User;
@@ -29,6 +35,7 @@ import liuliu.custom.desc.Constants;
 
 /**
  * Created by liuliu on 2015/10/26   9:27
+ * 登录的处理
  *
  * @author 柳伟杰
  * @Email 1031066280@qq.com
@@ -37,27 +44,29 @@ public class LoginListener {
     ILoginView mLoginView;
     UMSocialService mController = UMServiceFactory.getUMSocialService("com.umeng.login");
     User mUser;
+    Context mContext;
+    FinalDb mDB;
+    //封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
+    Oauth2AccessToken mAccessToken;
+    UsersAPI mUsersAPI;
 
-
-    public LoginListener(ILoginView loginView) {
+    public LoginListener(ILoginView loginView, Context context, FinalDb db) {
         this.mLoginView = loginView;
         mUser = new User();
-    }
-
-    /**
-     * 登录的时候传递过来的参数。
-     * 接受返回值用iLoginView.OnLoginResult(bool);
-     *
-     * @param name     登录的账号
-     * @param password 密码
-     */
-    public void doLogin(String name, String password) {
-        mLoginView.OnLoginResult(true, null);
+        mContext = context;
+        mDB = db;
     }
 
     /*qq快捷登录*/
     public void qqLogin() {
-        initQQ();
+        // 添加QQ支持, 并且设置QQ分享内容的target url
+        UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(LoginActivity.sInstance,
+                Constants.QQ_APPID, Constants.QQ_KEY);
+        qqSsoHandler.setTargetUrl("http://www.umeng.com");
+        qqSsoHandler.addToSocialSDK();
+        // 添加QZone平台
+        QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(LoginActivity.sInstance, Constants.QQ_APPID, Constants.QQ_KEY);
+        qZoneSsoHandler.addToSocialSDK();
         login(SHARE_MEDIA.QQ);
     }
 
@@ -66,11 +75,8 @@ public class LoginListener {
         ssoHandler.authorize(new AuthListener());
     }
 
-    private AuthInfo mAuthInfo;
-    private Oauth2AccessToken mAccessToken;//封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
-    private UsersAPI mUsersAPI;
-
-    class AuthListener implements WeiboAuthListener {
+    /*微博获得登录信息Listener*/
+    private class AuthListener implements WeiboAuthListener {
         @Override
         public void onComplete(Bundle values) {
             // 从 Bundle 中解析 Token
@@ -108,7 +114,7 @@ public class LoginListener {
                 com.sina.weibo.sdk.openapi.models.User user = com.sina.weibo.sdk.openapi.models.User.parse(response);
                 if (user != null) {//根据id获得登录微博用户的所有信息
                     mUser.setMessage("登录成功！");
-                    mUser.setId(user.id);//唯一ID
+                    mUser.setUid(user.id);//唯一ID
                     mUser.setNickname(user.screen_name);//昵称
                     if (!user.gender.isEmpty()) {//性别
                         switch (user.gender) {
@@ -125,16 +131,17 @@ public class LoginListener {
                     }
                     if (!user.location.isEmpty()) {
                         String loca[] = user.location.split(" ");
-                        if (loca.length >= 2) {
-                            mUser.setQq_city(user.location.split(" ")[1]);//qq上显示的所在市
-                        } else if (loca.length == 1) {
+                        if (loca.length > 1) {
                             mUser.setQq_province(user.location.split(" ")[0]);//qq显示的所在省
+                            if (loca.length >= 2) {
+                                mUser.setQq_city(user.location.split(" ")[1]);//qq上显示的所在市
+                            }
                         }
                     }
                     mUser.setHeadimg_urlbig(user.avatar_large);//大头像
                     mUser.setHeadimg_urlsmall(user.profile_image_url);//小头像(50*50)
                     mUser.setSigntype(SignType.SINA);
-                    mLoginView.OnLoginResult(true, mUser);
+                    updateUser(mUser);
                 } else {
                     Toast.makeText(LoginActivity.sInstance, response, Toast.LENGTH_LONG).show();
                 }
@@ -143,27 +150,13 @@ public class LoginListener {
 
         @Override
         public void onWeiboException(WeiboException e) {
-            ErrorInfo info = ErrorInfo.parse(e.getMessage());
-            Toast.makeText(LoginActivity.sInstance, info.toString(), Toast.LENGTH_LONG).show();
+            mLoginView.OnLoginResult(false, "登录失败！");
         }
     };
-
-    /*加载qq平台*/
-    private void initQQ() {
-        // 添加QQ支持, 并且设置QQ分享内容的target url
-        UMQQSsoHandler qqSsoHandler = new UMQQSsoHandler(LoginActivity.sInstance,
-                Constants.QQ_APPID, Constants.QQ_KEY);
-        qqSsoHandler.setTargetUrl("http://www.umeng.com");
-        qqSsoHandler.addToSocialSDK();
-        // 添加QZone平台
-        QZoneSsoHandler qZoneSsoHandler = new QZoneSsoHandler(LoginActivity.sInstance, Constants.QQ_APPID, Constants.QQ_KEY);
-        qZoneSsoHandler.addToSocialSDK();
-    }
 
     /*授权。如果授权成功，则获取用户信息*/
     private void login(final SHARE_MEDIA platform) {
         mController.doOauthVerify(LoginActivity.sInstance, platform, new SocializeListeners.UMAuthListener() {
-
             @Override
             public void onStart(SHARE_MEDIA platform) {
 
@@ -171,8 +164,7 @@ public class LoginListener {
 
             @Override
             public void onError(SocializeException e, SHARE_MEDIA platform) {
-                mUser.setMessage("授权失败！");
-                mLoginView.OnLoginResult(false, mUser);
+                mLoginView.OnLoginResult(false, "登录失败！");
             }
 
             @Override
@@ -182,15 +174,13 @@ public class LoginListener {
                     mUser.setUid(uid);
                     getUserInfo(platform);
                 } else {
-                    mUser.setMessage("授权失败！");
-                    mLoginView.OnLoginResult(false, mUser);
+                    mLoginView.OnLoginResult(false, "登录失败！");
                 }
             }
 
             @Override
             public void onCancel(SHARE_MEDIA platform) {
-                mUser.setMessage("授权失败！");
-                mLoginView.OnLoginResult(false, mUser);
+                mLoginView.OnLoginResult(false, "登录失败！");
             }
         });
     }
@@ -198,7 +188,6 @@ public class LoginListener {
     /*获取qq的用户信息*/
     private void getUserInfo(SHARE_MEDIA platform) {
         mController.getPlatformInfo(LoginActivity.sInstance, platform, new SocializeListeners.UMDataListener() {
-
             @Override
             public void onStart() {
 
@@ -220,8 +209,51 @@ public class LoginListener {
                         }
                     }
                     mUser.setSigntype(SignType.QQ);
-                    mLoginView.OnLoginResult(true, mUser);
+                    updateUser(mUser);
                 }
+            }
+        });
+    }
+
+    /*更新用户信息 User*/
+    private void updateUser(final User user) {
+        BmobQuery<User> bmobQuery = new BmobQuery<User>();
+        bmobQuery.addWhereEndsWith("uid", user.getUid());
+        bmobQuery.findObjects(mContext, new FindListener<User>() {
+            @Override
+            public void onSuccess(List<User> list) {
+                if (list.size() == 1) {//数据库中存在一条记录(不可能存在多条记录，uid为唯一主键)
+                    list.get(0).update(mContext, new UpdateListener() {
+                        @Override
+                        public void onSuccess() {//添加成功以后保存在数据库中。
+                            mDB.save(user);
+                            mLoginView.OnLoginResult(true, "登录成功！");
+                        }
+
+                        @Override
+                        public void onFailure(int i, String s) {
+                            mLoginView.OnLoginResult(false, "登录失败！");
+                        }
+                    });
+                } else {
+                    user.save(mContext, new SaveListener() {
+                        @Override
+                        public void onSuccess() {//添加成功以后保存在数据库中。
+                            mDB.save(user);
+                            mLoginView.OnLoginResult(true, "登录成功！");
+                        }
+
+                        @Override
+                        public void onFailure(int i, String s) {
+                            mLoginView.OnLoginResult(false, "登录失败！");
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onError(int i, String s) {
+                mLoginView.OnLoginResult(false, "登录失败！");
             }
         });
     }

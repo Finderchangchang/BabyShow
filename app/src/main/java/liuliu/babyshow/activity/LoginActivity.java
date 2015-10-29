@@ -4,13 +4,14 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.sina.weibo.sdk.auth.AuthInfo;
-import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
-import com.sina.weibo.sdk.openapi.UsersAPI;
 
 import net.tsz.afinal.annotation.view.CodeNote;
+
+import java.util.List;
 
 import liuliu.babyshow.R;
 import liuliu.babyshow.base.BaseActivity;
@@ -33,7 +34,7 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     @CodeNote(id = R.id.password_et_login)
     ImageEditText user_pwd;//密码
     @CodeNote(id = R.id.qq_iv_login, click = "onClick")
-    LinearLayout qq_login;
+    RelativeLayout qq_login;
     @CodeNote(id = R.id.sina_iv_login, click = "onClick")
     LinearLayout sina_login;
     @CodeNote(id = R.id.wenxin_iv_login, click = "onClick")
@@ -41,19 +42,21 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     private AuthInfo mAuthInfo;
     private SsoHandler mSsoHandler;//注意：SsoHandler 仅当 SDK 支持 SSO 时有效
-    private Oauth2AccessToken mAccessToken;//封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
-    private UsersAPI mUsersAPI;
 
     @Override
     public void initViews() {
         setContentView(R.layout.activity_login);
-        mlistener = new LoginListener(this);
         sInstance = this;
+        mlistener = new LoginListener(this, sInstance, finalDb);
     }
 
     @Override
     public void initEvents() {
-        mUsersAPI = new UsersAPI(this, Constants.SINA_KEY, mAccessToken);//微博信息初始化
+        List list = finalDb.findAll(new User().getClass());
+        if (list.size() == 1) {
+            Utils.IntentPost(sInstance, MainActivity.class);
+            sInstance.finish();
+        }
     }
 
     public void onClick(View view) {
@@ -67,8 +70,8 @@ public class LoginActivity extends BaseActivity implements ILoginView {
                 mlistener.qqLogin();
                 break;
             case R.id.sina_iv_login:
-                mAuthInfo = new AuthInfo(LoginActivity.sInstance, Constants.SINA_APPID, Constants.REDIRECT_URL, Constants.SCOPE);
-                mSsoHandler = new SsoHandler(LoginActivity.sInstance, mAuthInfo);
+                mAuthInfo = new AuthInfo(sInstance, Constants.SINA_APPID, Constants.REDIRECT_URL, Constants.SCOPE);
+                mSsoHandler = new SsoHandler(sInstance, mAuthInfo);
                 mlistener.sinaLogin(mSsoHandler);
                 break;
         }
@@ -83,12 +86,14 @@ public class LoginActivity extends BaseActivity implements ILoginView {
             mSsoHandler.authorizeCallBack(requestCode, resultCode, data);
         }
     }
+
+    /*处理登录成功和失败*/
     @Override
-    public void OnLoginResult(boolean result, User user) {
+    public void OnLoginResult(boolean result, String message) {
         if (result) {//登录成功
-
-        } else {//登录失败
-
+            Utils.IntentPost(sInstance, MainActivity.class);
+            sInstance.finish();
         }
+        Utils.ToastShort(sInstance, message);
     }
 }

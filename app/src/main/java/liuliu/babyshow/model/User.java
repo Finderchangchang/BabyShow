@@ -156,4 +156,15 @@ public class User extends BmobObject {
     public void setQq_province(String qq_province) {
         this.qq_province = qq_province;
     }
+
+    public String getContent() {
+        if (content == null) {
+            content = "这个人很懒什么都没留下...";
+        }
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 }

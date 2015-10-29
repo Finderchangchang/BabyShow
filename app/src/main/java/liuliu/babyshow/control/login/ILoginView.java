@@ -1,7 +1,5 @@
 package liuliu.babyshow.control.login;
 
-import liuliu.babyshow.model.User;
-
 /**
  * Created by liuliu on 2015/10/26   9:26
  * 登录View
@@ -10,5 +8,5 @@ import liuliu.babyshow.model.User;
  * @Email 1031066280@qq.com
  */
 public interface ILoginView {
-    void OnLoginResult(boolean result, User user);//登录操作
+    void OnLoginResult(boolean result, String message);//登录操作
 }
