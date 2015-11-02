@@ -10,8 +10,7 @@ import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 
 import net.tsz.afinal.annotation.view.CodeNote;
-
-import java.util.List;
+import net.tsz.afinal.cache.ACache;
 
 import liuliu.babyshow.R;
 import liuliu.babyshow.base.BaseActivity;
@@ -42,22 +41,24 @@ public class LoginActivity extends BaseActivity implements ILoginView {
 
     private AuthInfo mAuthInfo;
     private SsoHandler mSsoHandler;//注意：SsoHandler 仅当 SDK 支持 SSO 时有效
+    ACache mCache;
 
     @Override
     public void initViews() {
         setContentView(R.layout.activity_login);
         sInstance = this;
         mlistener = new LoginListener(this, sInstance, finalDb);
+        mCache = ACache.get(sInstance);
     }
 
     @Override
     public void initEvents() {
-        List list = finalDb.findAll(new User().getClass());
-        if (list.size() == 1) {
+        if (finalDb.findAll(new User().getClass()).size() == 1) {
             Utils.IntentPost(sInstance, MainActivity.class);
             sInstance.finish();
         }
     }
+
 
     public void onClick(View view) {
         switch (view.getId()) {

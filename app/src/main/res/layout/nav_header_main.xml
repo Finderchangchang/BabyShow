@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_ll_left_nav_view_main"
     android:layout_width="match_parent"
     android:layout_height="@dimen/nav_header_height"
     android:background="@drawable/side_nav_bar"
@@ -11,27 +12,27 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
+    <liuliu.custom.control.image.CircleImageView
         android:id="@+id/user_img_left_menu_main"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@android:drawable/sym_def_app_icon" />
 
     <TextView
-        android:id="@+id/user_name_tv_left_menu_main"
+        android:id="@+id/user_name_tv_main_left_menu_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="Android Studio"
+        android:text="未登录"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
     <TextView
-        android:id="@+id/user_desc_tv_left_menu_main"
+        android:id="@+id/user_desc_tv_main_left_menu_main"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
-        android:text="android.studio@android.com"
-        android:textColor="@color/umeng_socialize_text_title"/>
+        android:text="这个人很懒什么都没留下..."
+        android:textColor="@color/umeng_socialize_text_title" />
 
 </LinearLayout>

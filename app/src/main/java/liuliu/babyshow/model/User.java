@@ -10,7 +10,7 @@ import cn.bmob.v3.BmobObject;
  * @author 柳伟杰
  * @Email 1031066280@qq.com
  */
-public class User extends BmobObject {
+public class User extends BmobObject{
     private String id;//登录的账号
     private String uid;//唯一的编码（后台返回的）
     private int signtype;//登录方式（NORMAL = 0,默认情况;QQ = 1,qq登录;SINA = 2,新浪登录;WEIXIN = 3,微信登录）

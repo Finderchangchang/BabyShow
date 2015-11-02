@@ -1,6 +1,7 @@
 package liuliu.babyshow.control.login;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -20,6 +21,7 @@ import com.umeng.socialize.sso.QZoneSsoHandler;
 import com.umeng.socialize.sso.UMQQSsoHandler;
 
 import net.tsz.afinal.FinalDb;
+import net.tsz.afinal.cache.ACache;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,8 @@ import liuliu.babyshow.activity.LoginActivity;
 import liuliu.babyshow.model.SignType;
 import liuliu.babyshow.model.User;
 import liuliu.custom.desc.Constants;
+import liuliu.custom.method.cache.ImageGetFromHttp;
+import liuliu.custom.model.Cache;
 
 /**
  * Created by liuliu on 2015/10/26   9:27
@@ -49,11 +53,13 @@ public class LoginListener {
     //封装了 "access_token"，"expires_in"，"refresh_token"，并提供了他们的管理功能
     Oauth2AccessToken mAccessToken;
     UsersAPI mUsersAPI;
+    ACache mCache;
 
     public LoginListener(ILoginView loginView, Context context, FinalDb db) {
         this.mLoginView = loginView;
         mUser = new User();
         mContext = context;
+        mCache = ACache.get(context);
         mDB = db;
     }
 
@@ -226,8 +232,7 @@ public class LoginListener {
                     list.get(0).update(mContext, new UpdateListener() {
                         @Override
                         public void onSuccess() {//添加成功以后保存在数据库中。
-                            mDB.save(user);
-                            mLoginView.OnLoginResult(true, "登录成功！");
+                            saveUser(user);
                         }
 
                         @Override
@@ -239,8 +244,7 @@ public class LoginListener {
                     user.save(mContext, new SaveListener() {
                         @Override
                         public void onSuccess() {//添加成功以后保存在数据库中。
-                            mDB.save(user);
-                            mLoginView.OnLoginResult(true, "登录成功！");
+                            saveUser(user);
                         }
 
                         @Override
@@ -256,5 +260,25 @@ public class LoginListener {
                 mLoginView.OnLoginResult(false, "登录失败！");
             }
         });
+    }
+
+    /*保存用户信息*/
+    public void saveUser(User user) {
+        if (user.getHeadimg_urlbig() != null) {
+            Bitmap bitmap = ImageGetFromHttp.downloadBitmap(user.getHeadimg_urlbig());
+            if (bitmap != null) {
+                user.setHeadimg_big(bitmap);
+            }
+        }
+        if (user.getHeadimg_urlsmall() != null) {
+            Bitmap bitmap = ImageGetFromHttp.downloadBitmap(user.getHeadimg_urlsmall());
+            if (bitmap != null) {
+                user.setHeadimg_small(bitmap);
+            }
+        }
+        mDB.save(user);
+        mCache.put(Cache.CACHE_USER_BIG_IMG, user.getHeadimg_big());//大头像缓存
+        mCache.put(Cache.CACHE_USER_SMALL_IMG, user.getHeadimg_small());//小头像缓存
+        mLoginView.OnLoginResult(true, "登录成功！");
     }
 }
