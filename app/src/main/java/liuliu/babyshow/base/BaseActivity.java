@@ -55,7 +55,10 @@ public abstract class BaseActivity extends FinalActivity {
     protected void onStart() {
         super.onStart();
     }
-    /** 获取用户信息 */
+
+    /**
+     * 获取用户信息
+     */
     protected AuthorizeModel getLoginAuthorizeModel() {
         AuthorizeModel model = new AuthorizeModel();
         {
@@ -70,7 +73,9 @@ public abstract class BaseActivity extends FinalActivity {
         return model;
     }
 
-    /** 获取服务器信息 */
+    /**
+     * 获取服务器信息
+     */
     protected GlobalModel getGlobalModel() {
         GlobalModel model = new GlobalModel();
         {

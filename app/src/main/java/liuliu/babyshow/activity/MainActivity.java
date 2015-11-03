@@ -3,7 +3,6 @@ package liuliu.babyshow.activity;
 import android.graphics.Bitmap;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -13,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
@@ -23,8 +21,10 @@ import net.tsz.afinal.annotation.view.CodeNote;
 import net.tsz.afinal.cache.ACache;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import liuliu.babyshow.R;
+import liuliu.babyshow.adapter.RefreshListView;
 import liuliu.babyshow.base.BaseActivity;
 import liuliu.babyshow.control.main.IMainView;
 import liuliu.babyshow.model.User;
@@ -69,8 +69,10 @@ public class MainActivity extends BaseActivity
             case R.id.user_ll_left_nav_view_main://点击左侧title跳转到个人中心
                 break;
             case R.id.fab://浮动button点击事件
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();//底部消息提示栏
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();//底部消息提示栏
+                mAdapter.notifyDataSetChanged(newList);
+                mAdapter.notifyDataSetChanged();
                 break;
         }
     }
@@ -78,9 +80,11 @@ public class MainActivity extends BaseActivity
     // 列表长度
     static final int LIST_SIZE = 2000;
 
-    private ListView mListView;
+    private RefreshListView mListView;
     private VolleyListAdapter mAdapter;
     private RequestQueue mQueue;
+    List<VolleyItem> newList;
+
     @Override
     public void initEvents() {
         Bitmap big_img = mCache.getAsBitmap(Cache.CACHE_USER_BIG_IMG);
@@ -104,15 +108,16 @@ public class MainActivity extends BaseActivity
 
         initList();
     }
+
     /**
      * 初始化List
      */
     private void initList() {
-        mListView = (ListView) findViewById(R.id.volley_listview);
+        mListView = (RefreshListView) findViewById(R.id.volley_listview);
 
         // TODO 初始化数据
         ArrayList<VolleyItem> items = new ArrayList<VolleyItem>(LIST_SIZE);
-//		String imgUrl = "http://img0.bdstatic.com/img/image/%E6%9C%AA%E6%A0%87%E9%A2%98-1.jpg";
+        String imgUrls = "http://img0.bdstatic.com/img/image/%E6%9C%AA%E6%A0%87%E9%A2%98-1.jpg";
         String imgUrl = "http://pic24.nipic.com/20120920/10361578_112230424175_2.jpg";
         for (int i = 1; i <= LIST_SIZE; i++) {
             VolleyItem item = new VolleyItem();
@@ -121,11 +126,18 @@ public class MainActivity extends BaseActivity
             item.setImgUrl(imgUrl + "?rank=" + i);
             items.add(item);
         }
-
+        newList = new ArrayList<VolleyItem>();
+        for (int i = 0; i < 5; i++) {
+            VolleyItem item = new VolleyItem();
+            item.setName("添加的内容");
+            item.setImgUrl(imgUrls);
+            newList.add(item);
+        }
         // TODO 绑定数据
         mAdapter = new VolleyListAdapter(this, mQueue, items);
         mListView.setAdapter(mAdapter);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
