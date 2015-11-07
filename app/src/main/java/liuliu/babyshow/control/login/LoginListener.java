@@ -31,7 +31,7 @@ import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 import liuliu.babyshow.activity.LoginActivity;
-import liuliu.babyshow.model.SignType;
+import liuliu.babyshow.type.SignTypes;
 import liuliu.babyshow.model.User;
 import liuliu.custom.desc.Constants;
 import liuliu.custom.method.cache.ImageGetFromHttp;
@@ -146,7 +146,7 @@ public class LoginListener {
                     }
                     mUser.setHeadimg_urlbig(user.avatar_large);//大头像
                     mUser.setHeadimg_urlsmall(user.profile_image_url);//小头像(50*50)
-                    mUser.setSigntype(SignType.SINA);
+                    mUser.setSignTypes(SignTypes.SINA);
                     updateUser(mUser);
                 } else {
                     Toast.makeText(LoginActivity.sInstance, response, Toast.LENGTH_LONG).show();
@@ -214,7 +214,8 @@ public class LoginListener {
                             mUser.setHeadimg_urlsmall(img_url.replace("100", "40").toString());
                         }
                     }
-                    mUser.setSigntype(SignType.QQ);
+//                    mUser.setSigntype(SignType.QQ);
+                    mUser.setSignTypes(SignTypes.QQ);
                     updateUser(mUser);
                 }
             }
@@ -226,43 +227,61 @@ public class LoginListener {
         BmobQuery<User> bmobQuery = new BmobQuery<User>();
         bmobQuery.addWhereEndsWith("uid", user.getUid());
         bmobQuery.findObjects(mContext, new FindListener<User>() {
-            @Override
-            public void onSuccess(List<User> list) {
-                if (list.size() == 1) {//数据库中存在一条记录(不可能存在多条记录，uid为唯一主键)
-                    list.get(0).update(mContext, new UpdateListener() {
-                        @Override
-                        public void onSuccess() {//添加成功以后保存在数据库中。
-                            saveUser(user);
-                        }
+                    @Override
+                    public void onSuccess(List<User> list) {
+                        if (list.size() == 1) {//数据库中存在一条记录(不可能存在多条记录，uid为唯一主键)
+                            list.get(0).update(mContext, new UpdateListener() {
+                                @Override
+                                public void onSuccess() {//添加成功以后保存在数据库中。
+                                    saveUser(user);
+                                }
 
-                        @Override
-                        public void onFailure(int i, String s) {
-                            mLoginView.OnLoginResult(false, "登录失败！");
-                        }
-                    });
-                } else {
-                    user.save(mContext, new SaveListener() {
-                        @Override
-                        public void onSuccess() {//添加成功以后保存在数据库中。
-                            saveUser(user);
-                        }
+                                @Override
+                                public void onFailure(int i, String s) {
+                                    mLoginView.OnLoginResult(false, "登录失败！");
+                                }
+                            });
+                        } else {
+                            user.save(mContext, new SaveListener() {
+                                @Override
+                                public void onSuccess() {//添加成功以后保存在数据库中。
+                                    saveUser(user);
+                                }
 
-                        @Override
-                        public void onFailure(int i, String s) {
-                            mLoginView.OnLoginResult(false, "登录失败！");
+                                @Override
+                                public void onFailure(int i, String s) {
+                                    mLoginView.OnLoginResult(false, "登录失败！");
+                                }
+                            });
                         }
-                    });
+                    }
+
+                    @Override
+                    public void onError(int i, String s) {
+                        if (i == 101) {//没有user表
+                            user.save(mContext, new SaveListener() {
+                                @Override
+                                public void onSuccess() {//添加成功以后保存在数据库中。
+                                    saveUser(user);
+                                }
+
+                                @Override
+                                public void onFailure(int i, String s) {
+                                    mLoginView.OnLoginResult(false, "登录失败！");
+                                }
+                            });
+                        } else {
+                            mLoginView.OnLoginResult(false, "登录失败！");
+
+                        }
+                    }
                 }
-            }
 
-            @Override
-            public void onError(int i, String s) {
-                mLoginView.OnLoginResult(false, "登录失败！");
-            }
-        });
+        );
     }
 
     /*保存用户信息*/
+
     public void saveUser(User user) {
         if (user.getHeadimg_urlbig() != null) {
             Bitmap bitmap = ImageGetFromHttp.downloadBitmap(user.getHeadimg_urlbig());

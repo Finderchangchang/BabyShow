@@ -32,6 +32,7 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
     final int PULL = 1;//提示下拉状态
     final int RELESE = 2;//提示释放状态
     final int REFLASHING = 3;//刷新状态
+    IReflashListener iReflashListener;
 
 
     public RefreshListView(Context context) {
@@ -109,6 +110,8 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
             case MotionEvent.ACTION_UP:
                 if (state == RELESE) {
                     state = REFLASHING;
+                    //加载更多数据
+                    iReflashListener.onReflash();
                 } else if (state == PULL) {
                     state = NONE;
                     isRemark = false;
@@ -124,7 +127,7 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
             return;
         }
         int tempY = (int) ev.getY();
-        int space = (tempY - startY)/2;
+        int space = (tempY - startY) / 2;
         int topPadding = space - headerHeight;
 
         switch (state) {
@@ -167,14 +170,27 @@ public class RefreshListView extends ListView implements AbsListView.OnScrollLis
                 topPadding(0);
                 Handler handler = new Handler();
 
-                Runnable updateThread = new Runnable(){
-                    public void run(){
+                Runnable updateThread = new Runnable() {
+                    public void run() {
                         topPadding(-headerHeight);
-                        state=NONE;
+                        state = NONE;
                     }
                 };
                 handler.postDelayed(updateThread, 3000);
                 break;
         }
+    }
+
+    public void setiReflashListener(IReflashListener listener) {
+        this.iReflashListener = listener;
+    }
+
+    public interface IReflashListener {
+        void onReflash();
+    }
+    public void reflashComplete(){
+        state=NONE;
+        isRemark=false;
+        reflashViewByState();
     }
 }

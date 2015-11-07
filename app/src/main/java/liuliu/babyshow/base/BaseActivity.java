@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.StrictMode;
 
 import net.tsz.afinal.FinalActivity;
-import net.tsz.afinal.FinalDb;
 
 import cn.bmob.v3.Bmob;
 import liuliu.custom.method.Utils;
@@ -21,11 +20,10 @@ import liuliu.custom.model.HttpModel;
  */
 public abstract class BaseActivity extends FinalActivity {
     public HttpModel httpModel;
-    public FinalDb finalDb;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        finalDb = FinalDb.create(BaseActivity.this);
+
         httpModel = new HttpModel();
         initViews();
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -39,22 +37,6 @@ public abstract class BaseActivity extends FinalActivity {
     public abstract void initViews();
 
     public abstract void initEvents();
-
-    /*activity销毁处理*/
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 
     /**
      * 获取用户信息

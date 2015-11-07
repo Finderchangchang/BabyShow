@@ -40,7 +40,7 @@
         </activity>
         <activity
             android:name=".activity.LoginActivity"
-            android:theme="@style/AppThemes"></activity>
+            android:theme="@style/AppThemecc"></activity>
         <!-- ############ QQ空间和QQ SSO授权的Activity注册 ############ -->
         <activity
             android:name="com.tencent.tauth.AuthActivity"

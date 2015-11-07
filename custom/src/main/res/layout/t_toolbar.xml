@@ -12,15 +12,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#4276fb"
-        android:minHeight="0dp"
         android:elevation="10dip"
+        android:minHeight="0dp"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"></android.support.v7.widget.Toolbar>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:orientation="horizontal"
-        android:elevation="10dip">
+        android:elevation="10dip"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/toolbar_left_ll"
@@ -38,7 +38,8 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"
                 android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp" />
+                android:layout_marginRight="5dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/toolbar_left_ll_user_type_title"
@@ -47,6 +48,16 @@
                 android:textColor="@android:color/white"
                 android:textSize="12sp"
                 android:textStyle="bold" />
+
+            <liuliu.custom.control.image.CircleImageView
+                android:id="@+id/toolbar_left_user_img"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:src="@mipmap/ttoolbar_person"
+                app:border_color="@color/white"
+                app:border_width="1dp"/>
         </LinearLayout>
 
         <TextView

@@ -12,7 +12,7 @@
         android:id="@+id/toolbar_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:center_title="用户登录" />
+        app:center_title="用户登录"/>
 
     <liuliu.custom.control.edittext.ImageEditText
         android:id="@+id/user_et_login"

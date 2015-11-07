@@ -9,6 +9,7 @@ import android.widget.RelativeLayout;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 
+import net.tsz.afinal.FinalDb;
 import net.tsz.afinal.annotation.view.CodeNote;
 import net.tsz.afinal.cache.ACache;
 
@@ -18,12 +19,15 @@ import liuliu.babyshow.control.login.ILoginView;
 import liuliu.babyshow.control.login.LoginListener;
 import liuliu.babyshow.model.User;
 import liuliu.custom.control.edittext.ImageEditText;
+import liuliu.custom.control.toolbar.TToolbar;
 import liuliu.custom.desc.Constants;
 import liuliu.custom.method.Utils;
 
 public class LoginActivity extends BaseActivity implements ILoginView {
     LoginListener mlistener;
     public static LoginActivity sInstance;
+    @CodeNote(id = R.id.toolbar_login)
+    TToolbar tToolbar;//头
     @CodeNote(id = R.id.user_btn_login, click = "onClick")
     Button login_btn;
     @CodeNote(id = R.id.reg_user_btn_login, click = "onClick")
@@ -42,11 +46,13 @@ public class LoginActivity extends BaseActivity implements ILoginView {
     private AuthInfo mAuthInfo;
     private SsoHandler mSsoHandler;//注意：SsoHandler 仅当 SDK 支持 SSO 时有效
     ACache mCache;
+    FinalDb finalDb;
 
     @Override
     public void initViews() {
         setContentView(R.layout.activity_login);
         sInstance = this;
+        finalDb = FinalDb.create(this);
         mlistener = new LoginListener(this, sInstance, finalDb);
         mCache = ACache.get(sInstance);
     }

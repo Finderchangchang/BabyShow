@@ -3,17 +3,19 @@ package liuliu.babyshow.model;
 import android.graphics.Bitmap;
 
 import cn.bmob.v3.BmobObject;
+import liuliu.babyshow.type.SignTypes;
 
 /**
  * Created by liuliu on 2015/10/24   9:29
+ * 用户信息model
  *
  * @author 柳伟杰
  * @Email 1031066280@qq.com
  */
-public class User extends BmobObject{
+public class User extends BmobObject {
     private String id;//登录的账号
     private String uid;//唯一的编码（后台返回的）
-    private int signtype;//登录方式（NORMAL = 0,默认情况;QQ = 1,qq登录;SINA = 2,新浪登录;WEIXIN = 3,微信登录）
+    private SignTypes signTypes;
     private String nickname;//用户名（昵称）
     private String gender;//性别
     private String qq_city;//qq账号显示：所在城市
@@ -43,14 +45,6 @@ public class User extends BmobObject{
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public int getSigntype() {
-        return signtype;
-    }
-
-    public void setSigntype(int signtype) {
-        this.signtype = signtype;
     }
 
     public String getNickname() {
@@ -166,5 +160,13 @@ public class User extends BmobObject{
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public SignTypes getSignTypes() {
+        return signTypes;
+    }
+
+    public void setSignTypes(SignTypes signTypes) {
+        this.signTypes = signTypes;
     }
 }

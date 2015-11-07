@@ -3,6 +3,7 @@ package liuliu.custom.control.toolbar;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -14,6 +15,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import liuliu.custom.R;
+import liuliu.custom.control.image.CircleImageView;
 
 /**
  * Created by liuliu on 2015/09/30   16:55
@@ -23,10 +25,12 @@ import liuliu.custom.R;
  */
 public class TToolbar extends LinearLayout {
     int left_img_int;
+    int left_user_img_int;
     int right_img_int;
     float toolbar_elevation;
     String center_title_str;
     String left_title_str;
+    boolean left_user_visible;
     boolean left_clickable;
     boolean center_clickable;
     boolean right_clickable;
@@ -36,6 +40,7 @@ public class TToolbar extends LinearLayout {
     TextView left_user_type_title;
     ImageView right_message_bg;
     TextView right_message;
+    CircleImageView left_user_img;
     LinearLayout left_ll;
     RelativeLayout center_rl;
     RelativeLayout right_ll;
@@ -44,10 +49,12 @@ public class TToolbar extends LinearLayout {
     LeftOnClickListener leftOnClickListener;
     RightOnClickListener rightOnClickListener;
     CenterOnClickListener centerOnClickListener;
+
     public TToolbar(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TToolbar, defStyle, 0);
         left_img_int = a.getResourceId(R.styleable.TToolbar_left_img, 0);
+        left_user_img_int = a.getResourceId(R.styleable.TToolbar_left_user_img, 0);
         right_img_int = a.getResourceId(R.styleable.TToolbar_right_img, 0);
         center_title_str = a.getString(R.styleable.TToolbar_center_title);
         left_title_str = a.getString(R.styleable.TToolbar_left_title);
@@ -55,6 +62,7 @@ public class TToolbar extends LinearLayout {
         center_clickable = a.getBoolean(R.styleable.TToolbar_center_ll_clickable, false);
         right_clickable = a.getBoolean(R.styleable.TToolbar_right_ll_clickable, true);
         toolbar_elevation = a.getDimension(R.styleable.TToolbar_toolbar_elevation, 0);
+        left_user_visible = a.getBoolean(R.styleable.TToolbar_left_user_visible, false);
         a.recycle();
         init(context);
     }
@@ -71,7 +79,8 @@ public class TToolbar extends LinearLayout {
         right_message_bg = (ImageView) this.findViewById(R.id.toolbar_right_message_bg);
         total_rl = (RelativeLayout) this.findViewById(R.id.toolbar_top_rl);
         right_rl_message = (RelativeLayout) this.findViewById(R.id.toolbar_right_rl_message);
-        center_rl= (RelativeLayout) this.findViewById(R.id.toolbar_center_ll);
+        center_rl = (RelativeLayout) this.findViewById(R.id.toolbar_center_ll);
+        left_user_img = (CircleImageView) this.findViewById(R.id.toolbar_left_user_img);
         if (toolbar_elevation != 0) {
             setToolbarElevation(toolbar_elevation);
         }
@@ -79,10 +88,18 @@ public class TToolbar extends LinearLayout {
             center_title.setText(center_title_str);
         }
         //设置左侧右侧图片显示以及点击事件
-        if (left_img_int != 0 || left_title_str != null) {
+        if (left_img_int != 0 || left_title_str != null || left_user_visible) {
             left_ll.setVisibility(VISIBLE);
             setLeftTitle(left_title_str);
-            setLeftImg(left_img_int);
+            if (left_img_int != 0) {
+                setLeftImg(left_img_int);
+            }
+            if (left_user_visible) {
+                left_user_img.setVisibility(VISIBLE);
+                if (left_user_img_int != 0) {
+                    setLeftUserImg(left_user_img_int);
+                }
+            }
             if (left_clickable) {
                 left_ll.setClickable(true);
                 left_ll.setOnClickListener(new OnClickListener() {
@@ -100,7 +117,7 @@ public class TToolbar extends LinearLayout {
         } else {
             right_ll.setVisibility(View.GONE);
         }
-        if(center_clickable){
+        if (center_clickable) {
             center_rl.setClickable(true);
             center_rl.setOnClickListener(new OnClickListener() {
                 @Override
@@ -138,6 +155,17 @@ public class TToolbar extends LinearLayout {
      */
     public void setLeftImg(Drawable drawable) {
         left_img.setImageDrawable(drawable);
+    }
+
+    /**
+     * 设置带圆边的头像
+     */
+    public void setLeftUserImg(Bitmap drawable) {
+        left_user_img.setImageBitmap(drawable);
+    }
+
+    public void setLeftUserImg(int drawable) {
+        right_img.setImageResource(drawable);
     }
 
     //设置右侧图片
@@ -189,7 +217,7 @@ public class TToolbar extends LinearLayout {
     }
 
     //获得中间的文本内容
-    public String getCenterText(){
+    public String getCenterText() {
         return center_title.getText().toString().trim();
     }
 
@@ -200,9 +228,12 @@ public class TToolbar extends LinearLayout {
     }
 
     public interface LeftOnClickListener {//左侧点击事件
+
         void leftclick();
     }
-    public interface CenterOnClickListener{//中间点击事件
+
+    public interface CenterOnClickListener {//中间点击事件
+
         void centerclick();
     }
 
@@ -210,8 +241,8 @@ public class TToolbar extends LinearLayout {
         rightOnClickListener = rightOnClick;
     }
 
-    public void setCenterOnClick(CenterOnClickListener centerOnClick){
-        centerOnClickListener=centerOnClick;
+    public void setCenterOnClick(CenterOnClickListener centerOnClick) {
+        centerOnClickListener = centerOnClick;
     }
 
     public void setLeftOnClick(LeftOnClickListener leftOnClick) {
